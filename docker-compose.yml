@@ -1,0 +1,42 @@
+version: '3.6'
+services:
+    mongodb:
+        container_name: "mongodb"
+        image: mongo:latest
+        ports: 
+            - "27017:27017"
+        networks: 
+            - internal-net
+        restart: always        
+    mongo_seed:
+        container_name: mongo_seeded
+        image: voteapp/mongo_seeded:v1
+        networks:
+            - internal-net
+        depends_on:
+            - mongodb
+    api-golang:
+        container_name: api-golang
+        image: voteapp/api-golang:v1
+        ports: 
+            - "8080:8080"
+        environment:
+            - MONGO_CONN_STR=mongodb://mongodb:27017/langdb
+        restart: on-failure
+        networks: 
+            - internal-net
+    frontend-react:
+        container_name: frontend-react
+        image: voteapp/frontend-react:v1
+        build: .
+        ports: 
+            - "80:80"
+        networks: 
+            - internal-net
+            
+networks: 
+    internal-net: {}
+    
+    
+   
+    
